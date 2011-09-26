@@ -17,7 +17,7 @@
  * @package     Nooku_Components
  * @subpackage  Default
  */
-class ComDefaultDispatcher extends KDispatcherDefault implements KObjectInstantiatable
+class ComDefaultDispatcher extends KDispatcherDefault
 { 
  	/**
      * Initializes the options for the object
@@ -42,7 +42,7 @@ class ComDefaultDispatcher extends KDispatcherDefault implements KObjectInstanti
      *
      * @return KDispatcherDefault
      */
-    public static function getInstance($config = array())
+    public static function instantiate($config = array())
     {
         static $instance;
         
@@ -53,7 +53,7 @@ class ComDefaultDispatcher extends KDispatcherDefault implements KObjectInstanti
             $instance = new $classname($config);
               
             //Add the factory map to allow easy access to the singleton
-            KFactory::map('dispatcher', $config->identifier);
+            KIdentifier::setAlias('dispatcher', $config->identifier);
         }
         
         return $instance;
@@ -80,7 +80,7 @@ class ComDefaultDispatcher extends KDispatcherDefault implements KObjectInstanti
             $url = clone(KRequest::url());
             $url->query['view'] = $this->getController()->getView()->getName();
            
-            KFactory::get('joomla:application')->redirect($url);
+            JFactory::getApplication()->redirect($url);
         }
        
         return parent::_actionDispatch($context);
@@ -98,7 +98,7 @@ class ComDefaultDispatcher extends KDispatcherDefault implements KObjectInstanti
     {
         $view  = $this->getController()->getView();
     
-        $document = KFactory::get('joomla:document');
+        $document = JFactory::getDocument();
         $document->setMimeEncoding($view->mimetype);
         
         return parent::_actionRender($context);
