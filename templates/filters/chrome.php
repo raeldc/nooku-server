@@ -17,7 +17,7 @@
  * @package     Koowa_Template
  * @subpackage	Filter
  */
-class ModDefaultChrome extends KTemplateFilterAbstract implements KTemplateFilterWrite
+class ModDefaultTemplateFilterChrome extends KTemplateFilterAbstract implements KTemplateFilterWrite
 {
   	/**
      * Constructor.
@@ -44,7 +44,7 @@ class ModDefaultChrome extends KTemplateFilterAbstract implements KTemplateFilte
     {
         $config->append(array(
             'priority'   => KCommand::PRIORITY_LOW,
-            'template'   => KFactory::get('joomla:application')->getTemplate()
+            'template'   => JFactory::getApplication()->getTemplate()
         ));
 
         parent::_initialize($config);

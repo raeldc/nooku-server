@@ -28,13 +28,9 @@ class ModDefaultHtml extends KViewHtml
      * @return  void
      */
     protected function _initialize(KConfig $config)
-    {     
-        $template = clone $this->getIdentifier();
-        $template->name = 'template';
-        
+    {      
         $config->append(array(
-            'template' 		   => $template,
-        	'template_filters' => array('mod://site/default.chrome'),
+        	'template_filters' => array('chrome'),
             'data'			   => array(
                 'styles' => array() 
             )
@@ -63,7 +59,7 @@ class ModDefaultHtml extends KViewHtml
 		//Load the language files.
 		//Type only exists if the module is loaded through ComExtensionsModelsModules
 		if(isset($this->module->type)) {
-            KFactory::get('joomla:language')->load($this->module->type);
+            JFactory::getLanguage()->load($this->module->type);
 		}
         
         if(empty($this->module->content)) 
