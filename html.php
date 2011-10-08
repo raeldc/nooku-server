@@ -17,23 +17,8 @@
  * @package     Nooku_Modules
  * @subpackage  Default
  */
-class ModDefaultView extends KViewHtml
+class ModDefaultHtml extends KViewHtml
 {
-    /**
-     * Constructor
-     *
-     * @param   object  An optional KConfig object with configuration options
-     */
-    public function __construct(KConfig $config)
-    {
-        parent::__construct($config);
-        
-        //Assign module specific options
-        $this->params  = $config->params;
-        $this->module  = $config->module;
-        $this->attribs = $config->attribs;
-    }
-    
     /**
      * Initializes the default configuration for the object
      *
@@ -43,15 +28,12 @@ class ModDefaultView extends KViewHtml
      * @return  void
      */
     protected function _initialize(KConfig $config)
-    {     
-        $template = clone $this->getIdentifier();
-        $template->name = 'template';
-        
+    {      
         $config->append(array(
-            'template'    => $template,
-            'params'      => null,
-            'module'      => null,
-            'attribs'     => array(),
+        	'template_filters' => array('chrome'),
+            'data'			   => array(
+                'styles' => array() 
+            )
         ));
         
         parent::_initialize($config);
@@ -64,7 +46,7 @@ class ModDefaultView extends KViewHtml
 	 */
 	public function getName()
 	{
-		return $this->_identifier->package;
+		return $this->getIdentifier()->package;
 	}
 	  
     /**
@@ -74,10 +56,43 @@ class ModDefaultView extends KViewHtml
      */
     public function display()
     { 
-        $this->output = $this->getTemplate()
+		//Load the language files.
+		//Type only exists if the module is loaded through ComExtensionsModelsModules
+		if(isset($this->module->type)) {
+            JFactory::getLanguage()->load($this->module->type);
+		}
+        
+        if(empty($this->module->content)) 
+		{
+            $this->output = $this->getTemplate()
                 ->loadIdentifier($this->_layout, $this->_data)
                 ->render();
-                
+		}
+		else 
+		{
+		     $this->output = $this->getTemplate()
+                ->loadString($this->module->content, $this->_data, false)
+                ->render();
+		}
+	
         return $this->output;
+    }
+    
+    /**
+     * Set a view properties
+     *
+     * @param   string  The property name.
+     * @param   mixed   The property value.
+     */
+    public function __set($property, $value)
+    {
+        if($property == 'module') 
+        {
+            if(is_string($value->params)) {
+                $value->params = new JParameter($value->params);
+            }
+        }
+        
+        parent::__set($property, $value);
     }
 }
