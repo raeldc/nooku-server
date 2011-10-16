@@ -18,14 +18,6 @@ defined('KOOWA') or die('Restricted access') ?>
 <style src="media://com_articles/css/article-form.css" />
 
 <script>
-    var categories = <?= json_encode(@service('com://admin/articles.model.categories')->getList()) ?>;
-
-    <? if($article->category_id) : ?>
-        window.addEvent('domready', function() {
-            document.id('article-form-categories').set('value', <?= $article->category_id ?>);
-        });
-    <? endif ?>
-
     if(Form && Form.Validator) {
         Form.Validator.add('validate-unsigned', {
             errorMsg: Form.Validator.getMsg("required"),
@@ -36,7 +28,7 @@ defined('KOOWA') or die('Restricted access') ?>
     }
 </script>
 
-<form action="<?= @route('id='.$article->id) ?>" method="post" id="article-form" class="-koowa-form">
+<form action="" method="post" id="article-form" class="-koowa-form">
     <div id="main" class="grid_8">
         <div class="panel title clearfix">
             <input class="inputbox required" type="text" name="title" id="title" size="40" maxlength="255" value="<?= $article->title ?>" placeholder="<?= @text('Title') ?>" />

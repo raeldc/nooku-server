@@ -1,11 +1,11 @@
 /**
- * @version		$Id$
- * @category	Nooku
- * @package    	Nooku_Server
- * @subpackage 	Template
- * @copyright	Copyright (C) 2011 Timble CVBA and Contributors. (http://www.timble.net)
- * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
- * @link		http://www.nooku.org
+ * @version     $Id$
+ * @category    Nooku
+ * @package     Nooku_Server
+ * @subpackage  Template
+ * @copyright   Copyright (C) 2011 Timble CVBA and Contributors. (http://www.timble.net)
+ * @license     GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
+ * @link        http://www.nooku.org
  */
   
 /**
@@ -14,8 +14,8 @@
  *
  * Inspiration: chromatable.js by Zachary Siswick
  *   
- * @author    	Stian Didriksen <http://nooku.assembla.com/profile/stiandidriksen>
- * @category 	Nooku
+ * @author      Stian Didriksen <http://nooku.assembla.com/profile/stiandidriksen>
+ * @category    Nooku
  * @package     Nooku_Server
  * @subpackage  Template
  */
@@ -67,18 +67,6 @@ var ChromaTable = new Class({
 			checkbox.addEvent('change', function(tr){
 				this.getProperty('checked') ? tr.addClass('selected') : tr.removeClass('selected');
 			}.pass(tr, checkbox));
-			tr.addEvents({
-				dblclick: function(event){
-					window.location.href = this.getElement('a').get('href');
-				},
-				contextmenu: function(event){
-					var modal = this.getElement('a.modal');
-					if(modal) {
-						event.preventDefault();	
-						modal.fireEvent('click');
-					}
-				}
-			});
 		});
 		
         this.thead = inner.getElement('thead');
@@ -107,8 +95,29 @@ var ChromaTable = new Class({
             
             elements.include(cloned);
             
+            //Make sure table headers are aligned to table cells
+            var tbody = this.table.getElement('tbody'), row = tbody.getElement('tr');
+            if(row) {
+                var cells = row.getElements('td'), values = [];
+                cells.each(function(td){
+                    td.get('colspan').toInt().times(function(){
+                        values.push(td.getStyle('text-align'));
+                    });
+                });
+                thead.getElements('tr').each(function(tr){
+                    var i = 0;
+                    tr.getChildren().each(function(child){
+                        child.setStyle('text-align', values[i]);
+                        child.get('colspan').toInt().times(function(){
+                            i++;
+                        });
+                    });
+                });
+            }
+            
+            
             //Do sortable magic
-            var sortables = thead.getElements('th.-koowa-sortable'), tbody = this.table.getElement('tbody'), rows;
+            var sortables = thead.getElements('th.-koowa-sortable'), rows;
             tbody.getChildren().each(function(tr, i){
                 tr.set('data-index', i);
             });
@@ -146,6 +155,7 @@ var ChromaTable = new Class({
                     });
                     tbody.adopt(rows);
                     sortable.toggleClass('-koowa-sortable-reverse');
+                    sortable.hasClass('-koowa-sortable-reverse') ? sortable.addClass('-koowa-desc').removeClass('-koowa-asc') : sortable.addClass('-koowa-asc').removeClass('-koowa-desc');
                 }.bind(this));
             }, this);
 		}
@@ -226,7 +236,10 @@ var ChromaTable = new Class({
 		if(thead) {
 		    thead.setStyle('width', this.getComputedWidth(this.table.getElement('thead')));
 			this.table.getElement('thead').getElements('td, th').each(function(td, i){
-				thead.getElement('thead').getElements('td, th')[i].setStyle('width', this.getComputedWidth(td));
+				thead.getElement('thead').getElements('td, th')[i].setStyles({
+				    width: this.getComputedWidth(td),
+				    //textAlign: td.getStyle('text-align')
+				});
 			}, this);
 		}
 		

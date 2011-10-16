@@ -23,6 +23,18 @@ class plgSystemKoowa extends JPlugin
 {
 	public function __construct($subject, $config = array())
 	{
+		// Command line fixes for Joomla
+		if (PHP_SAPI === 'cli') 
+		{
+			if (!isset($_SERVER['HTTP_HOST'])) {
+				$_SERVER['HTTP_HOST'] = '';
+			}
+			
+			if (!isset($_SERVER['REQUEST_METHOD'])) {
+				$_SERVER['REQUEST_METHOD'] = '';
+			}
+		}
+		
 		//Suhosin compatibility
 		if(in_array('suhosin', get_loaded_extensions()))
 		{
@@ -83,6 +95,40 @@ class plgSystemKoowa extends JPlugin
 	        $this->_authenticateUser();
 	    }
 	    
+	    /*
+	     * Dispatch the default dispatcher 
+	     *
+	     * If we are running in CLI mode bypass the default Joomla executition chain and dispatch the default
+	     * dispatcher.
+	     */
+	    if (PHP_SAPI === 'cli') 
+	    {
+	    	$url = null;
+	    	foreach ($_SERVER['argv'] as $arg) 
+	    	{
+	    		if (strpos($arg, '--url') === 0) 
+	    		{
+	    			$url = str_replace('--url=', '', $arg);
+	    			if (strpos($url, '?') === false) {
+	    				$url = '?'.$url;
+	    			}
+	    			break; 
+	    		}
+	    	}
+	    	
+	    	if (!empty($url)) 
+	    	{
+	    		$component = 'default';
+	    		$url = KService::get('koowa:http.url', array('url' => $url));
+    			if (!empty($url->query['option'])) {
+    				$component = substr($url->query['option'], 4);
+    			}
+
+	    		// Thanks Joomla. We will take it from here.
+	    		echo KService::get('com:'.$component.'.dispatcher.cli')->dispatch();
+	    		exit(0);	
+	    	}
+	    }
 	}
 	
 	/**
